@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Ruby元编程-方法 | Sven的博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Ruby是一门动态语言，动态创建与调用方法是其中一个体现。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Ruby元编程-方法">
+<meta property="og:url" content="http://yoursite.com/2016/08/29/metaprogramming-methods/index.html">
+<meta property="og:site_name" content="Sven的博客">
+<meta property="og:description" content="Ruby是一门动态语言，动态创建与调用方法是其中一个体现。">
+<meta property="og:locale">
+<meta property="article:published_time" content="2016-08-28T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-03-23T10:00:56.732Z">
+<meta property="article:author" content="Sven">
+<meta property="article:tag" content="Ruby">
+<meta property="article:tag" content="元编程">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="Sven的博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+
+<meta name="generator" content="Hexo 6.1.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Sven的博客</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-metaprogramming-methods" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2016/08/29/metaprogramming-methods/" class="article-date">
+  <time datetime="2016-08-28T16:00:00.000Z" itemprop="datePublished">2016-08-29</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Ruby元编程-方法
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Ruby是一门动态语言，动态创建与调用方法是其中一个体现。</p>
+<span id="more"></span>
+<h3 id="动态方法"><a href="#动态方法" class="headerlink" title="动态方法"></a>动态方法</h3><h4 id="动态调用方法（动态派发）"><a href="#动态调用方法（动态派发）" class="headerlink" title="动态调用方法（动态派发）"></a>动态调用方法（动态派发）</h4><p>动态调用方法，是指在代码中不通过硬编码而是在程序运行时自动去决定要调用的方法的一种行为。</p>
+<h4 id="示例代码1"><a href="#示例代码1" class="headerlink" title="示例代码1"></a>示例代码1</h4><figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Student</span></span><br><span class="line">  <span class="keyword">attr_accessor</span> <span class="symbol">:name</span>, <span class="symbol">:age</span>, <span class="symbol">:birthday</span></span><br><span class="line">  <span class="keyword">def</span> <span class="title function_">initialize</span>(<span class="params">args = &#123;&#125;</span>)</span><br><span class="line">    name = args[<span class="symbol">:name</span>]</span><br><span class="line">    age    = args[<span class="symbol">:age</span>]</span><br><span class="line">    birthday = args[<span class="symbol">:birthday</span>]</span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<p><code>【示例代码1】</code>中<code>initialize</code>方法中，给三个字段赋值的方式就是一种典型的硬编码方式，假如这三个字段的名称有改动，抑或添加、去掉字段的时候，不得不同时修改这个方法。为了避免这种情况，这里可以考虑使用动态调用的方式来重构它。</p>
+<h4 id="示例代码2"><a href="#示例代码2" class="headerlink" title="示例代码2"></a>示例代码2</h4><figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Student</span></span><br><span class="line">  <span class="keyword">attr_accessor</span> <span class="symbol">:name</span>, <span class="symbol">:age</span>, <span class="symbol">:birthday</span></span><br><span class="line">  <span class="keyword">def</span> <span class="title function_">initialize</span>(<span class="params">args = &#123;&#125;</span>)</span><br><span class="line">    args.each <span class="keyword">do</span> |<span class="params">key, value</span>|</span><br><span class="line">      method_name = <span class="string">&quot;<span class="subst">#&#123;key&#125;</span>=&quot;</span></span><br><span class="line">      <span class="variable language_">self</span>.send(<span class="string">&quot;<span class="subst">#&#123;key&#125;</span>=&quot;</span>, value) <span class="keyword">if</span> <span class="variable language_">self</span>.respond_to?(method_name)</span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<p>通过<code>【示例代码2】</code>的重构，但凡<code>attr_accessor</code>后面的字段有变动时，<code>initialize</code>方法都会自动进行适配。那么实现的原理是什么呢？</p>
+<p>在Ruby中，方法调用其实是向一个对象发送了一条消息，当接收方接收消息后，会在对象的祖先链中去寻找这个方法，找到之后调用它并返回给<code>self</code>对象（<a target="_blank" rel="noopener" href="http://www.jianshu.com/p/324fc76e68a2">详细见【对象模型篇】</a>）。也就是说，当调用<code>str.method</code>的时候，本质上就是发送了一条方法调用的消息，接收者是<code>str</code>对象，它等价于<code>str.send(:method)</code>。因此示例代码便很好理解了，它是将<code>args</code>这个hash中的值进行遍历，动态调用<code>attr_accessor</code>生成的<code>setter</code>和<code>getter</code>方法。但有一个问题，如果参数中有在<code>attr_accessor</code>未定义的字段怎么办？比如<code>Student.new(&#123; year: 2016 &#125;)</code>，<code>year</code>字段是未在<code>attr_accessor</code>中定义的，如果调用<code>self.year =</code>这个方法，是会拋异常的。所以这里添加了<code>respond_to?</code>来判断这个方法是否是存在的，存在再对它进行调用赋值。</p>
+<h4 id="动态定义方法"><a href="#动态定义方法" class="headerlink" title="动态定义方法"></a>动态定义方法</h4><p>关于动态定义方法，其实在第一章<a target="_blank" rel="noopener" href="http://www.jianshu.com/p/324fc76e68a2">对象模型篇</a>的<code>【示例代码1】</code>已经在使用了，就是对<code>define_method</code>的使用。在此基础之上，此处实现一个更加具有可用性的案例：</p>
+<h4 id="示例代码3"><a href="#示例代码3" class="headerlink" title="示例代码3"></a>示例代码3</h4><figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">module</span> Kernel</span><br><span class="line">  <span class="keyword">def</span> <span class="title function_">attr_access</span>(<span class="params">*args</span>)</span><br><span class="line">    args.each <span class="keyword">do</span> |<span class="params">arg</span>|</span><br><span class="line">      define_method(arg) <span class="keyword">do</span></span><br><span class="line">        instance_variable_get(<span class="string">&quot;@<span class="subst">#&#123;arg&#125;</span>&quot;</span>)</span><br><span class="line">      <span class="keyword">end</span></span><br><span class="line">      define_method(<span class="string">&quot;<span class="subst">#&#123;arg&#125;</span>=&quot;</span>) <span class="keyword">do</span> |<span class="params">value</span>|</span><br><span class="line">        instance_variable_set(<span class="string">&quot;@&#123;arg&#125;=&quot;</span>, value)</span><br><span class="line">      <span class="keyword">end</span></span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">def</span> <span class="title function_">cattr_access</span>(<span class="params">*args</span>)</span><br><span class="line">    args.each <span class="keyword">do</span> |<span class="params">arg</span>|</span><br><span class="line">      define_singleton_method(arg) <span class="keyword">do</span></span><br><span class="line">        <span class="variable language_">self</span>.class_variable_get(<span class="string">&quot;@@<span class="subst">#&#123;arg&#125;</span>&quot;</span>)</span><br><span class="line">      <span class="keyword">end</span></span><br><span class="line">      define_singleton_method(<span class="string">&quot;<span class="subst">#&#123;arg&#125;</span>=&quot;</span>) <span class="keyword">do</span> |<span class="params">value</span>|</span><br><span class="line">        <span class="variable language_">self</span>.class_variable_set(<span class="string">&quot;@@<span class="subst">#&#123;arg&#125;</span>&quot;</span>, value)</span><br><span class="line">      <span class="keyword">end</span></span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> A</span><br><span class="line">  cattr_access <span class="symbol">:a</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line">A.a = <span class="number">1</span></span><br><span class="line">p A.a  <span class="comment"># 输出1</span></span><br></pre></td></tr></table></figure>
+<p>此处不再说明<code>define_method</code>和<code>attr_access</code>的使用，重点说明一下<code>define_singleton_method</code>和<code>cattr_access</code>的实现。</p>
+<p><code>define_singleton_method</code>和<code>define_method</code>的区别是，前者定义的是<code>单例方法</code>（这里可称为类方法），后者定义的是<code>实例方法</code>。从用法来看，<code>cattr_access</code>声明的变量直接在类（这里是<code>A</code>）上调用，而<code>attr_access</code>声明的变量需要在<code>A</code>类对象实例化（<code>A.new</code>）之后调用。同理，<code>class_variable_set</code>和<code>class_variable_get</code>定义的是单例变量（这里指类变量），而<code>instance_variable_set</code>和<code>instance_variable_get</code>定义的是实例变量。由于Ruby的语法约定，以<code>@</code>开头的为实例变量，以<code>@@</code>开头的为类变量，因此，在定义变量时尤其要注意变量的全名，否则会拋异常。</p>
+<h4 id="幽灵方法"><a href="#幽灵方法" class="headerlink" title="幽灵方法"></a>幽灵方法</h4><p>还记得之前在方法查找中，如果找不到方法时，会触发一个<code>NoMethodError</code>的异常拋出。然而它来源于向对象发送了一个消息调用了一个方法叫做<code>method_missing</code>。</p>
+<p>假如对一个<code>String</code>类对象<code>str</code>调用<code>test_method_a</code>，即<code>str.test_method_a</code>，由于这个方法未定义，因此在祖先链中找不到这个方法。此时会发送一个消息<code>str.send(:method_missing, :test_method_a)</code>，从而拋出<code>NoMethodError</code>的异常。也就是说，当找不到要调用的方法时，会自动触发调用<code>method_missing</code>方法。那么如果重写了某个类的<code>method_missing</code>方法会是什么样的结果呢？</p>
+<h4 id="示例代码4"><a href="#示例代码4" class="headerlink" title="示例代码4"></a>示例代码4</h4><figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">module</span> <span class="variable constant_">XML</span></span><br><span class="line">  <span class="keyword">def</span> <span class="title function_">method_missing</span>(<span class="params">name, *args, &amp;block</span>)</span><br><span class="line">    <span class="keyword">if</span> <span class="string">%W(html head title body div)</span>.<span class="keyword">include</span>?(name.to_s)</span><br><span class="line">      define_singleton_method(name) <span class="keyword">do</span> |<span class="params">*as, &amp;bl</span>|</span><br><span class="line">        <span class="variable">@_str</span> |<span class="params"></span>|= <span class="string">&#x27;&#x27;</span></span><br><span class="line">        <span class="variable">@_str</span> += <span class="string">&quot;&lt;<span class="subst">#&#123;name&#125;</span>&quot;</span></span><br><span class="line">        as = as[<span class="number">0</span>]</span><br><span class="line">        as.each <span class="keyword">do</span> |<span class="params">k, v</span>|</span><br><span class="line">          <span class="variable">@_str</span> += <span class="string">&quot; <span class="subst">#&#123;k&#125;</span>=\&quot;<span class="subst">#&#123;v&#125;</span>\&quot;&quot;</span></span><br><span class="line">        <span class="keyword">end</span> <span class="keyword">if</span> as</span><br><span class="line">        <span class="variable">@_str</span> += <span class="string">&#x27;&gt;&#x27;</span></span><br><span class="line">        <span class="keyword">if</span> bl</span><br><span class="line">          _str = <span class="variable">@_str</span></span><br><span class="line">          <span class="variable">@_str</span> = <span class="string">&#x27;&#x27;</span></span><br><span class="line">          _str += bl.call |<span class="params"></span>| <span class="string">&#x27;&#x27;</span></span><br><span class="line">          <span class="variable">@_str</span> = _str</span><br><span class="line">        <span class="keyword">end</span></span><br><span class="line">        <span class="variable">@_str</span> += <span class="string">&quot;&lt;/<span class="subst">#&#123;name&#125;</span>&gt;&quot;</span></span><br><span class="line">      <span class="keyword">end</span></span><br><span class="line">      <span class="variable language_">self</span>.send(name, *args, &amp;block)</span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">include</span> <span class="variable constant_">XML</span></span><br><span class="line"></span><br><span class="line">xml = \</span><br><span class="line">html(<span class="symbol">doctype:</span> <span class="string">&#x27;app&#x27;</span>) &#123;</span><br><span class="line">  head &#123;</span><br><span class="line">    title &#123; <span class="string">&#x27;this is title&#x27;</span> &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  body(<span class="symbol">onload:</span> <span class="string">&#x27;javacript:void(0)&#x27;</span>) &#123;</span><br><span class="line">    div(<span class="symbol">class:</span> <span class="string">&#x27;v1&#x27;</span>) &#123; <span class="string">&#x27;div1&#x27;</span> &#125;</span><br><span class="line">    div(<span class="symbol">class:</span> <span class="string">&#x27;v2&#x27;</span>) &#123; <span class="string">&#x27;div2&#x27;</span> &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">p xml  </span><br><span class="line"><span class="comment"># 输出&quot;&lt;html doctype=\&quot;app\&quot;&gt;&lt;head&gt;&lt;title&gt;this is title&lt;/title&gt;&lt;/head&gt;&lt;body onload=\&quot;javacript:void(0)\&quot;&gt;&lt;div class=\&quot;v1\&quot;&gt;div1&lt;/div&gt;&lt;div class=\&quot;v2\&quot;&gt;div2&lt;/div&gt;&lt;/body&gt;&lt;/html&gt;&quot;</span></span><br></pre></td></tr></table></figure>
+<p>由于在<code>method_missing</code>中对调用方法的名字做了限制，必须是<code>html</code>、<code>head</code>、<code>title</code>、<code>body</code>、<code>div</code>其中之一才会生成代码，因此无需担心其它额外正常调用不存在方法的时候不能正常拋出<code>NoMethodError</code>异常的情况。由于在调用不存在的方法时就会调用<code>method_missing</code>这个方法，因此如果要重写这个方法一定要格外小心，<code>能力越大，责任越大</code>。</p>
+<h4 id="幽灵方法与普通动态方法的优劣"><a href="#幽灵方法与普通动态方法的优劣" class="headerlink" title="幽灵方法与普通动态方法的优劣"></a>幽灵方法与普通动态方法的优劣</h4><p>普通动态方法是指，在类初始化时便使用<code>define_method</code>等手段将需要的所有方法定义好。幽灵方法本质是在调用时，如果发现不存在方法时，那么即时定义这个方法并产生一次调用，从示例可以看出幽灵方法在定义方法时也是调用的<code>define_method</code>等行为来定义动态方法。与普通定义动态方法的区别是，如果一个对象永远没有调用一个方法，那么这个方法永远不会被定义，只有调用过一次时它才会被定义，因此使用幽灵方法时，对象所占用的内存空间比普通动态方法要少，反之付出的代价是第一次在祖先链中查找该方法的时间变长。<code>这可以认为是一种以时间换取空间的策略。</code></p>
+<h3 id="动态代理"><a href="#动态代理" class="headerlink" title="动态代理"></a>动态代理</h3><p>动态代理的原理是，对<code>a</code>对象的操作转移到<code>b</code>对象上来，Ruby中使用<code>delegate</code>库来实现动态代理。</p>
+<h4 id="示例代码5"><a href="#示例代码5" class="headerlink" title="示例代码5"></a>示例代码5</h4><figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">UserProfile</span></span><br><span class="line">  <span class="keyword">def</span> <span class="title function_">initialize</span>(<span class="params">name</span>)</span><br><span class="line">    <span class="variable">@name</span> = name</span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line">  <span class="keyword">def</span> <span class="title function_">hello</span></span><br><span class="line">    <span class="string">&quot;<span class="subst">#&#123;<span class="variable">@name</span>&#125;</span> says hello.&quot;</span></span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">User</span> &lt; <span class="title class_ inherited__">DelegateClass</span>(UserProfile)</span><br><span class="line">  <span class="keyword">def</span> <span class="title function_">initialize</span>(<span class="params">user_profile</span>)</span><br><span class="line">    <span class="variable language_">super</span>(user_profile)</span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line">user_profile = <span class="title class_">UserProfile</span>.new(<span class="string">&quot;Rapheal&quot;</span>)</span><br><span class="line">user = <span class="title class_">User</span>.new(user_profile)</span><br><span class="line">p user.hello  <span class="comment"># 输出 &quot;Rapheal says hello.&quot;</span></span><br></pre></td></tr></table></figure>
+<h4 id="关于respond-to"><a href="#关于respond-to" class="headerlink" title="关于respond_to?"></a>关于respond_to?</h4><p><code>respond_to?</code>是Ruby中用于判断一个方法是否存在的一个方法。比如，<code>Class.respond_to?(:new) #返回true</code>，说明<code>Class</code>这个类可以调用<code>new</code>方法。这个方法通常与<code>define_method</code>、<code>method_missing</code>等方法一起使用，与<code>method_missing</code>一样，不到万不得已，不要修改这个方法。</p>
+<h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p>本章主要讲了使用define_method来定义动态方法，使用method_missing来处理<code>NoMethodError</code>的情况。依然是那句话，能力越大，责任越大。如果能加以善用，那么这些特征能使的代码的灵活度越来越高，反之只能使之晦涩难懂甚至导致难以追踪的BUG。慎之！慎之！</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2016/08/29/metaprogramming-methods/" data-id="cl13gprpi00042ms61p1vao2n" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Ruby/" rel="tag">Ruby</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%85%83%E7%BC%96%E7%A8%8B/" rel="tag">元编程</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2016/10/15/es7-async-and-await/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          es7中的async/await
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2016/08/29/ruby-load-file/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">浅淡Ruby的文件加载与继承</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node/" rel="tag">Node</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node-js/" rel="tag">Node.js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Ruby/" rel="tag">Ruby</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Slain-Memories/" rel="tag">Slain Memories</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Wall-slide/" rel="tag">Wall slide</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/babel/" rel="tag">babel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/decorator/" rel="tag">decorator</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/electron/" rel="tag">electron</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/es6/" rel="tag">es6</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/es7/" rel="tag">es7</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/" rel="tag">node</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pm2/" rel="tag">pm2</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/" rel="tag">webpack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%85%83%E7%BC%96%E7%A8%8B/" rel="tag">元编程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8E%9F%E5%88%9B/" rel="tag">原创</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%89%92%E8%B0%B1/" rel="tag">扒谱</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%96%87%E4%BB%B6%E5%8A%A0%E8%BD%BD/" rel="tag">文件加载</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%AE%97%E6%B3%95/" rel="tag">算法</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/Node/" style="font-size: 10px;">Node</a> <a href="/tags/Node-js/" style="font-size: 10px;">Node.js</a> <a href="/tags/Ruby/" style="font-size: 20px;">Ruby</a> <a href="/tags/Slain-Memories/" style="font-size: 10px;">Slain Memories</a> <a href="/tags/Wall-slide/" style="font-size: 15px;">Wall slide</a> <a href="/tags/babel/" style="font-size: 10px;">babel</a> <a href="/tags/decorator/" style="font-size: 10px;">decorator</a> <a href="/tags/electron/" style="font-size: 10px;">electron</a> <a href="/tags/es6/" style="font-size: 10px;">es6</a> <a href="/tags/es7/" style="font-size: 15px;">es7</a> <a href="/tags/node/" style="font-size: 10px;">node</a> <a href="/tags/pm2/" style="font-size: 10px;">pm2</a> <a href="/tags/webpack/" style="font-size: 10px;">webpack</a> <a href="/tags/%E5%85%83%E7%BC%96%E7%A8%8B/" style="font-size: 15px;">元编程</a> <a href="/tags/%E5%8E%9F%E5%88%9B/" style="font-size: 20px;">原创</a> <a href="/tags/%E6%89%92%E8%B0%B1/" style="font-size: 20px;">扒谱</a> <a href="/tags/%E6%96%87%E4%BB%B6%E5%8A%A0%E8%BD%BD/" style="font-size: 10px;">文件加载</a> <a href="/tags/%E7%AE%97%E6%B3%95/" style="font-size: 10px;">算法</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">March 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">June 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">August 2016</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2020/03/08/slain-memories/">扒谱第三弹《Slain Memories》</a>
+          </li>
+        
+          <li>
+            <a href="/2019/06/07/third-song/">Em转Bm小调第三进行曲</a>
+          </li>
+        
+          <li>
+            <a href="/2018/03/23/wall-slide-v2/">Wall slide自扒试听</a>
+          </li>
+        
+          <li>
+            <a href="/2017/08/27/second-song/">e小调第二进行曲</a>
+          </li>
+        
+          <li>
+            <a href="/2017/06/07/first-song/">降b小调第一进行曲</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2022 Sven<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+
+  
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+  </div>
+</body>
+</html>

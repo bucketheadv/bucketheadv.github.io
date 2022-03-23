@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>使用webpack构建electron项目 | Sven的博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Webpack是一个很强大的构建工具，不过也有不少坑。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用webpack构建electron项目">
+<meta property="og:url" content="http://yoursite.com/2016/10/23/electron-built-with-webpack/index.html">
+<meta property="og:site_name" content="Sven的博客">
+<meta property="og:description" content="Webpack是一个很强大的构建工具，不过也有不少坑。">
+<meta property="og:locale">
+<meta property="og:image" content="http://yoursite.com/.com//1.png">
+<meta property="article:published_time" content="2016-10-22T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-03-23T10:00:56.667Z">
+<meta property="article:author" content="Sven">
+<meta property="article:tag" content="webpack">
+<meta property="article:tag" content="electron">
+<meta property="article:tag" content="es6">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/.com//1.png">
+  
+    <link rel="alternate" href="/atom.xml" title="Sven的博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+
+<meta name="generator" content="Hexo 6.1.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Sven的博客</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-electron-built-with-webpack" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2016/10/23/electron-built-with-webpack/" class="article-date">
+  <time datetime="2016-10-22T16:00:00.000Z" itemprop="datePublished">2016-10-23</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      使用webpack构建electron项目
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Webpack是一个很强大的构建工具，不过也有不少坑。</p>
+<span id="more"></span>
+<h2 id="新建项目"><a href="#新建项目" class="headerlink" title="新建项目"></a>新建项目</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">mkdir</span> todo &amp;&amp; <span class="built_in">cd</span> todo</span><br><span class="line">npm init</span><br></pre></td></tr></table></figure>
+<h2 id="安装必要的package"><a href="#安装必要的package" class="headerlink" title="安装必要的package"></a>安装必要的package</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">### 安装webpack相关包</span></span><br><span class="line">npm install --save-dev webpack html-webpack-plugin</span><br><span class="line"><span class="comment">### 安装babel相关包</span></span><br><span class="line">npm install --save-dev babel-core babel-loader babel-plugin-transform-es2015-spread babel-plugin-transform-object-rest-spread babel-preset-es2015 babel-preset-react</span><br><span class="line"><span class="comment">### 安装electron相关包</span></span><br><span class="line">npm install --save electron</span><br><span class="line">npm install --save-dev electron-packager</span><br><span class="line"><span class="comment">### 安装react相关包</span></span><br><span class="line">npm install --save react react-dom react-tap-event-plugin</span><br><span class="line"><span class="comment">### UI相关包</span></span><br><span class="line">npm install --save material-ui</span><br></pre></td></tr></table></figure>
+<h2 id="项目结构图"><a href="#项目结构图" class="headerlink" title="项目结构图"></a>项目结构图</h2><p><img src="/.com//1.png" alt="img-1"></p>
+<h2 id="webpack配置"><a href="#webpack配置" class="headerlink" title="webpack配置"></a>webpack配置</h2><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> webpack = <span class="built_in">require</span>(<span class="string">&#x27;webpack&#x27;</span>)</span><br><span class="line"><span class="keyword">var</span> path = <span class="built_in">require</span>(<span class="string">&#x27;path&#x27;</span>)</span><br><span class="line"><span class="keyword">var</span> fs = <span class="built_in">require</span>(<span class="string">&#x27;fs&#x27;</span>)</span><br><span class="line"><span class="keyword">var</span> <span class="title class_">HtmlWebpackPlugin</span> = <span class="built_in">require</span>(<span class="string">&#x27;html-webpack-plugin&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> config = &#123;</span><br><span class="line">  <span class="comment">// key是生成文件的路径, value是源文件路径</span></span><br><span class="line">  <span class="attr">entry</span>: &#123;</span><br><span class="line">    <span class="string">&#x27;js/bundle&#x27;</span>: <span class="string">&#x27;./src/components/index.jsx&#x27;</span>,</span><br><span class="line">    <span class="string">&#x27;main&#x27;</span>: <span class="string">&#x27;./src/main.jsx&#x27;</span></span><br><span class="line">  &#125;,</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 解决__dirname和__filename路径混乱的问题</span></span><br><span class="line">  <span class="attr">node</span>: &#123;</span><br><span class="line">    <span class="attr">__filename</span>: <span class="literal">false</span>,</span><br><span class="line">    <span class="attr">__dirname</span>: <span class="literal">false</span></span><br><span class="line">  &#125;,</span><br><span class="line"></span><br><span class="line">  <span class="comment">// webpack重实现了require方法，导致大量原生包无法调用，据说也可以添加这句：&quot;var fs = global.require(&#x27;fs&#x27;)&quot;</span></span><br><span class="line">  <span class="attr">target</span>: <span class="string">&#x27;atom&#x27;</span>,</span><br><span class="line"></span><br><span class="line">  <span class="attr">output</span>: &#123;</span><br><span class="line">    <span class="attr">path</span>: path.<span class="title function_">join</span>(__dirname, <span class="string">&#x27;dist&#x27;</span>),</span><br><span class="line">    <span class="attr">filename</span>: <span class="string">&quot;[name].js&quot;</span></span><br><span class="line">  &#125;,</span><br><span class="line"></span><br><span class="line">  <span class="attr">module</span>: &#123;</span><br><span class="line">    <span class="attr">loaders</span>: [</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="comment">//test: path.join(__dirname, &#x27;es6&#x27;),</span></span><br><span class="line">        <span class="attr">test</span>: <span class="regexp">/\.jsx$/</span>,</span><br><span class="line">        <span class="attr">exclude</span>: <span class="regexp">/node_modules/</span>,</span><br><span class="line">        <span class="attr">loader</span>: <span class="string">&#x27;babel-loader&#x27;</span>,</span><br><span class="line">        <span class="attr">query</span>: &#123;</span><br><span class="line">          <span class="attr">presets</span>: [<span class="string">&#x27;es2015&#x27;</span>, <span class="string">&#x27;react&#x27;</span>],</span><br><span class="line">          <span class="attr">plugins</span>: [<span class="string">&#x27;transform-object-rest-spread&#x27;</span>]</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;,</span><br><span class="line">      <span class="comment">/*</span></span><br><span class="line"><span class="comment">      &#123;</span></span><br><span class="line"><span class="comment">        test: /\.(gif|jpg|png|woff|svg|eot|ttf)\??.*$/,</span></span><br><span class="line"><span class="comment">        loader: &#x27;url-loader?limit=50000&amp;name=[path][name].[ext]&#x27;</span></span><br><span class="line"><span class="comment">      &#125;</span></span><br><span class="line"><span class="comment">      */</span></span><br><span class="line">    ]</span><br><span class="line">  &#125;,</span><br><span class="line"></span><br><span class="line">  <span class="attr">resolve</span>: [</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">root</span>: path.<span class="title function_">resolve</span>(__dirname, <span class="string">&quot;src&quot;</span>),</span><br><span class="line">      <span class="attr">extensions</span>: [<span class="string">&#x27;&#x27;</span>, <span class="string">&#x27;.js&#x27;</span>, <span class="string">&#x27;.jsx&#x27;</span>, <span class="string">&#x27;.css&#x27;</span>, <span class="string">&#x27;.scss&#x27;</span>]</span><br><span class="line">    &#125;</span><br><span class="line">  ],</span><br><span class="line"></span><br><span class="line">  <span class="attr">plugins</span>: [</span><br><span class="line">    <span class="keyword">new</span> <span class="title class_">HtmlWebpackPlugin</span>(&#123;</span><br><span class="line">      <span class="attr">filename</span>: <span class="string">&#x27;html/index.html&#x27;</span>,</span><br><span class="line">      <span class="attr">inject</span>: <span class="literal">false</span>, <span class="comment">//不添加entry列表里的文件到index.html</span></span><br><span class="line">      <span class="attr">template</span>: path.<span class="title function_">join</span>(__dirname, <span class="string">&quot;/src/html/index.html&quot;</span>) <span class="comment">//new 一个这个插件的实例，并传入相关的参数</span></span><br><span class="line">    &#125;)</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="variable language_">module</span>.<span class="property">exports</span> = config</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>webpack配置中有几条是比较坑的，</p>
+<ul>
+<li><p>首先是<code>target: &#39;atom&#39;</code>, 若不配置这个选项，那么electron在起动时会报错，错误内容是<code>require(&#39;fs&#39;)时，fs包不存在</code>。原因在于，webpack重新实现了require方法，因此很多原生包无法require，添加此配置即解决。</p>
+</li>
+<li><p>其次是 <code>node: &#123; __dirname: false, __filename: false &#125;</code> , 若不添加此配置，那么打包后的代码会修改<code>__dirname</code>和<code>__filename</code>的值导致无法获取正确的文件夹和文件路径。</p>
+</li>
+<li><p>最后是HtmlWebpackPlugin的 <code>inject: false</code>, 这个插件是用于打包<code>html</code>文件，默认会将所有生成的所有<code>javascript</code>文件插入到此<code>html</code>中，添加<code>inject: false</code>后将不再生成引入<code>javascript</code>文件的标签。</p>
+</li>
+</ul>
+<p>webpack打包后的文件放在dist文件夹下，因此程序入口调用的文件为<code>dist/main.js</code>。</p>
+<h2 id="package-json配置"><a href="#package-json配置" class="headerlink" title="package.json配置"></a>package.json配置</h2><p>主要是main和scripts的配置，如下：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;main&quot;</span><span class="punctuation">:</span> <span class="string">&quot;dist/main.js&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;scripts&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;test&quot;</span><span class="punctuation">:</span> <span class="string">&quot;echo \&quot;Error: no test specified\&quot; &amp;&amp; exit 1&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;dev&quot;</span><span class="punctuation">:</span> <span class="string">&quot;electron .&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;start&quot;</span><span class="punctuation">:</span> <span class="string">&quot;npm run build &amp;&amp; NODE_ENV=development electron .&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;build&quot;</span><span class="punctuation">:</span> <span class="string">&quot;node_modules/webpack/bin/webpack.js --progress --colors&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;pack&quot;</span><span class="punctuation">:</span> <span class="string">&quot;node_modules/electron-packager/cli.js ./ restron --platform=darwin --version=1.4.4 --out=./package --overwrite --icon=~/Node/electron/todo/public/img/tray.icon&quot;</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+<p>入口文件，用于调用webpack打包后的文件。</p>
+<h3 id="main-jsx"><a href="#main-jsx" class="headerlink" title="main.jsx"></a>main.jsx</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> electron = <span class="built_in">require</span>(<span class="string">&#x27;electron&#x27;</span>)</span><br><span class="line"><span class="keyword">const</span> &#123;app, <span class="title class_">BrowserWindow</span>, ipcMain&#125; = electron</span><br><span class="line"><span class="keyword">const</span> <span class="title class_">Tray</span> = electron.<span class="property">Tray</span></span><br><span class="line"><span class="keyword">const</span> path = <span class="built_in">require</span>(<span class="string">&#x27;path&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> mainWindow = <span class="literal">null</span></span><br><span class="line"><span class="keyword">let</span> appIcon;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> env = process.<span class="property">env</span>.<span class="property">NODE_ENV</span> || <span class="string">&#x27;production&#x27;</span></span><br><span class="line"></span><br><span class="line">app.<span class="title function_">on</span>(<span class="string">&#x27;ready&#x27;</span>, <span class="keyword">function</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="keyword">let</span> iconPath = path.<span class="title function_">join</span>(__dirname, <span class="string">&quot;/../public/img/tray.icns&quot;</span>)</span><br><span class="line">  mainWindow = <span class="keyword">new</span> <span class="title class_">BrowserWindow</span>(&#123;</span><br><span class="line">    <span class="attr">width</span>: <span class="number">800</span>,</span><br><span class="line">    <span class="attr">height</span>: <span class="number">600</span>,</span><br><span class="line">    <span class="attr">icon</span>: iconPath</span><br><span class="line">  &#125;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  <span class="comment">//appIcon = new Tray(iconPath);</span></span><br><span class="line">  <span class="comment">//appIcon.setToolTip(&#x27;This is my application&#x27;);</span></span><br><span class="line"></span><br><span class="line">  mainWindow.<span class="title function_">loadURL</span>(<span class="string">&#x27;file://&#x27;</span> + __dirname + <span class="string">&#x27;/html/index.html&#x27;</span>)</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (env == <span class="string">&#x27;development&#x27;</span>) &#123;</span><br><span class="line">    mainWindow.<span class="property">webContents</span>.<span class="title function_">openDevTools</span>()</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  mainWindow.<span class="title function_">on</span>(<span class="string">&#x27;closed&#x27;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">    mainWindow = <span class="literal">null</span></span><br><span class="line">  &#125;)</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">app.<span class="title function_">on</span>(<span class="string">&#x27;window-all-closed&#x27;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  app.<span class="title function_">quit</span>()</span><br><span class="line">&#125;)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>程序窗口的建立，建立完成后载入<code>html/index.html</code>, 此html文件中又加载了<code>components/index.js</code>渲染组件。</p>
+<h3 id="components-index-jsx"><a href="#components-index-jsx" class="headerlink" title="components/index.jsx"></a>components/index.jsx</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="title class_">React</span> <span class="keyword">from</span> <span class="string">&#x27;react&#x27;</span></span><br><span class="line"><span class="keyword">import</span> <span class="title class_">ReactDOM</span> <span class="keyword">from</span> <span class="string">&#x27;react-dom&#x27;</span></span><br><span class="line"><span class="keyword">import</span> injectTapEventPlugin <span class="keyword">from</span> <span class="string">&#x27;react-tap-event-plugin&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> events = <span class="variable language_">window</span>.<span class="built_in">require</span>(<span class="string">&#x27;events&#x27;</span>)</span><br><span class="line"><span class="keyword">const</span> path = <span class="variable language_">window</span>.<span class="built_in">require</span>(<span class="string">&#x27;path&#x27;</span>)</span><br><span class="line"><span class="keyword">const</span> fs = <span class="variable language_">window</span>.<span class="built_in">require</span>(<span class="string">&#x27;fs&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> electron = <span class="variable language_">window</span>.<span class="built_in">require</span>(<span class="string">&#x27;electron&#x27;</span>)</span><br><span class="line"><span class="keyword">const</span> &#123;ipcRenderer, shell&#125; = electron</span><br><span class="line"><span class="keyword">const</span> &#123;dialog&#125; = electron.<span class="property">remote</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> getMuiTheme <span class="keyword">from</span> <span class="string">&#x27;material-ui/styles/getMuiTheme&#x27;</span></span><br><span class="line"><span class="keyword">import</span> <span class="title class_">MuiThemeProvider</span> <span class="keyword">from</span> <span class="string">&#x27;material-ui/styles/MuiThemeProvider&#x27;</span></span><br><span class="line"><span class="keyword">import</span> <span class="title class_">TextField</span> <span class="keyword">from</span> <span class="string">&#x27;material-ui/TextField&#x27;</span></span><br><span class="line"><span class="keyword">import</span> <span class="title class_">RaisedButton</span> <span class="keyword">from</span> <span class="string">&#x27;material-ui/RaisedButton&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> muiTheme = <span class="title function_">getMuiTheme</span>(&#123;</span><br><span class="line">  <span class="attr">fontFamily</span>: <span class="string">&#x27;Microsoft YaHei&#x27;</span></span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MainWindow</span> <span class="keyword">extends</span> <span class="title class_ inherited__">React.Component</span> &#123;</span><br><span class="line">  <span class="title function_">constructor</span>(<span class="params">props</span>) &#123;</span><br><span class="line">    <span class="variable language_">super</span>(props)</span><br><span class="line">    <span class="title function_">injectTapEventPlugin</span>()</span><br><span class="line"></span><br><span class="line">    <span class="variable language_">this</span>.<span class="property">state</span> = &#123;</span><br><span class="line">      <span class="attr">username</span>: <span class="string">&#x27;&#x27;</span>,</span><br><span class="line">      <span class="attr">password</span>: <span class="string">&#x27;&#x27;</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="title function_">render</span>(<span class="params"></span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> (</span><br><span class="line">      <span class="language-xml"><span class="tag">&lt;<span class="name">MuiThemeProvider</span> <span class="attr">muiTheme</span>=<span class="string">&#123;muiTheme&#125;</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">        <span class="tag">&lt;<span class="name">div</span> <span class="attr">style</span>=<span class="string">&#123;styles.root&#125;</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">          <span class="tag">&lt;<span class="name">img</span> <span class="attr">style</span>=<span class="string">&#123;styles.icon&#125;</span> <span class="attr">src</span>=<span class="string">&quot;../../public/img/app-logo.jpg&quot;</span> /&gt;</span></span></span><br><span class="line"><span class="language-xml"></span></span><br><span class="line"><span class="language-xml">          <span class="tag">&lt;<span class="name">TextField</span></span></span></span><br><span class="line"><span class="tag"><span class="language-xml">            <span class="attr">hintText</span>=<span class="string">&quot;请输入用户名&quot;</span></span></span></span><br><span class="line"><span class="tag"><span class="language-xml">            <span class="attr">value</span>=<span class="string">&#123;this.state.username&#125;</span></span></span></span><br><span class="line"><span class="tag"><span class="language-xml">            <span class="attr">onChange</span>=<span class="string">&#123;(event)</span> =&gt;</span> &#123;this.setState(&#123;username: event.target.value&#125;)&#125;&#125;</span></span><br><span class="line"><span class="language-xml">          /&gt;</span></span><br><span class="line"><span class="language-xml"></span></span><br><span class="line"><span class="language-xml">          <span class="tag">&lt;<span class="name">TextField</span></span></span></span><br><span class="line"><span class="tag"><span class="language-xml">            <span class="attr">hintText</span>=<span class="string">&quot;请输入密码&quot;</span></span></span></span><br><span class="line"><span class="tag"><span class="language-xml">            <span class="attr">type</span>=<span class="string">&quot;password&quot;</span></span></span></span><br><span class="line"><span class="tag"><span class="language-xml">            <span class="attr">value</span>=<span class="string">&#123;this.state.password&#125;</span></span></span></span><br><span class="line"><span class="tag"><span class="language-xml">            <span class="attr">onChange</span>=<span class="string">&#123;(event)</span> =&gt;</span> &#123;this.setState(&#123;password: event.target.value&#125;)&#125;&#125;</span></span><br><span class="line"><span class="language-xml">          /&gt;</span></span><br><span class="line"><span class="language-xml"></span></span><br><span class="line"><span class="language-xml">          <span class="tag">&lt;<span class="name">div</span> <span class="attr">style</span>=<span class="string">&#123;styles.buttons_container&#125;</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">            <span class="tag">&lt;<span class="name">RaisedButton</span></span></span></span><br><span class="line"><span class="tag"><span class="language-xml">              <span class="attr">label</span>=<span class="string">&quot;登录&quot;</span></span></span></span><br><span class="line"><span class="tag"><span class="language-xml">              <span class="attr">primary</span>=<span class="string">&#123;true&#125;</span></span></span></span><br><span class="line"><span class="tag"><span class="language-xml">              <span class="attr">onClick</span>=<span class="string">&#123;this._handleLogin.bind(this)&#125;</span></span></span></span><br><span class="line"><span class="tag"><span class="language-xml">            /&gt;</span></span></span><br><span class="line"><span class="language-xml">            <span class="tag">&lt;<span class="name">RaisedButton</span></span></span></span><br><span class="line"><span class="tag"><span class="language-xml">              <span class="attr">label</span>=<span class="string">&quot;注册&quot;</span></span></span></span><br><span class="line"><span class="tag"><span class="language-xml">              <span class="attr">primary</span>=<span class="string">&#123;false&#125;</span></span></span></span><br><span class="line"><span class="tag"><span class="language-xml">              <span class="attr">style</span>=<span class="string">&#123;&#123;marginLeft:</span> <span class="attr">60</span>&#125;&#125;</span></span></span><br><span class="line"><span class="tag"><span class="language-xml">              <span class="attr">onClick</span>=<span class="string">&#123;this._handleRegistry.bind(this)&#125;</span></span></span></span><br><span class="line"><span class="tag"><span class="language-xml">            /&gt;</span></span></span><br><span class="line"><span class="language-xml">          <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">        <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">      <span class="tag">&lt;/<span class="name">MuiThemeProvider</span>&gt;</span></span></span><br><span class="line">    )</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="title function_">_handleRegistry</span>(<span class="params"></span>) &#123;&#125;</span><br><span class="line">  <span class="title function_">_handleLogin</span>(<span class="params"></span>) &#123;</span><br><span class="line">    <span class="keyword">let</span> options = &#123;</span><br><span class="line">      <span class="attr">type</span>: <span class="string">&#x27;info&#x27;</span>,</span><br><span class="line">      <span class="attr">buttons</span>: [<span class="string">&#x27;确定&#x27;</span>],</span><br><span class="line">      <span class="attr">title</span>: <span class="string">&#x27;登录&#x27;</span>,</span><br><span class="line">      <span class="attr">message</span>: <span class="variable language_">this</span>.<span class="property">state</span>.<span class="property">username</span>,</span><br><span class="line">      <span class="attr">defaultId</span>: <span class="number">0</span>,</span><br><span class="line">      <span class="attr">cancelId</span>: <span class="number">0</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    dialog.<span class="title function_">showMessageBox</span>(options, <span class="function">(<span class="params">res</span>) =&gt;</span> &#123;</span><br><span class="line">      <span class="keyword">if</span> (res == <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;OK pressed!&#x27;</span>);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> styles = &#123;</span><br><span class="line">  <span class="attr">root</span>: &#123;</span><br><span class="line">    <span class="attr">position</span>: <span class="string">&#x27;absolute&#x27;</span>,</span><br><span class="line">    <span class="attr">left</span>: <span class="number">0</span>,</span><br><span class="line">    <span class="attr">top</span>: <span class="number">0</span>,</span><br><span class="line">    <span class="attr">right</span>: <span class="number">0</span>,</span><br><span class="line">    <span class="attr">bottom</span>: <span class="number">0</span>,</span><br><span class="line">    <span class="attr">display</span>: <span class="string">&#x27;flex&#x27;</span>,</span><br><span class="line">    <span class="attr">flex</span>: <span class="number">1</span>,</span><br><span class="line">    <span class="attr">flexDirection</span>: <span class="string">&#x27;column&#x27;</span>,</span><br><span class="line">    <span class="attr">alignItems</span>: <span class="string">&#x27;center&#x27;</span>,</span><br><span class="line">    <span class="attr">justifyContent</span>: <span class="string">&#x27;center&#x27;</span></span><br><span class="line">  &#125;,</span><br><span class="line"></span><br><span class="line">  <span class="attr">icon</span>: &#123;</span><br><span class="line">    <span class="attr">width</span>: <span class="number">100</span>,</span><br><span class="line">    <span class="attr">height</span>: <span class="number">100</span>,</span><br><span class="line">    <span class="attr">marginBottom</span>: <span class="number">40</span></span><br><span class="line">  &#125;,</span><br><span class="line"></span><br><span class="line">  <span class="attr">buttons_container</span>: &#123;</span><br><span class="line">    <span class="attr">paddingTop</span>: <span class="number">30</span>,</span><br><span class="line">    <span class="attr">width</span>: <span class="string">&#x27;100%&#x27;</span>,</span><br><span class="line">    <span class="attr">display</span>: <span class="string">&#x27;flex&#x27;</span>,</span><br><span class="line">    <span class="attr">flexDirection</span>: <span class="string">&#x27;row&#x27;</span>,</span><br><span class="line">    <span class="attr">alignItems</span>: <span class="string">&#x27;center&#x27;</span>,</span><br><span class="line">    <span class="attr">justifyContent</span>: <span class="string">&#x27;center&#x27;</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="title class_">ReactDOM</span>.<span class="title function_">render</span>(</span><br><span class="line">  <span class="language-xml"><span class="tag">&lt;<span class="name">MainWindow</span> /&gt;</span></span>,</span><br><span class="line">  <span class="variable language_">document</span>.<span class="title function_">getElementById</span>(<span class="string">&#x27;app&#x27;</span>)</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<p>主要的组件，此组件实现了一个登录页面的表单。</p>
+<h3 id="html-index-html"><a href="#html-index-html" class="headerlink" title="html/index.html"></a>html/index.html</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE <span class="keyword">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">&quot;utf-8&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>Restron<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">&quot;app&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">&quot;text/javascript&quot;</span> <span class="attr">src</span>=<span class="string">&quot;../js/bundle.js&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>html代码中调用<code>../js/bundle.js</code>来渲染当前页面，它通过调用<code>ReactDOM.render</code>渲染已经定义的组件。</p>
+<h2 id="运行"><a href="#运行" class="headerlink" title="运行"></a>运行</h2><p>代码已经编写完成，执行<code>npm start</code>运行webpack打包并运行程序，<code>npm run build</code>是用webpack打包，<code>npm run pack</code>打包成app文件。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2016/10/23/electron-built-with-webpack/" data-id="cl13gprpp001p2ms64ugz5jit" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/electron/" rel="tag">electron</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/es6/" rel="tag">es6</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/webpack/" rel="tag">webpack</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2016/11/07/square-root-algorithm/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          Node.js实现平方根算法
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2016/10/15/es7-async-and-await/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">es7中的async/await</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node/" rel="tag">Node</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node-js/" rel="tag">Node.js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Ruby/" rel="tag">Ruby</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Slain-Memories/" rel="tag">Slain Memories</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Wall-slide/" rel="tag">Wall slide</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/babel/" rel="tag">babel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/decorator/" rel="tag">decorator</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/electron/" rel="tag">electron</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/es6/" rel="tag">es6</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/es7/" rel="tag">es7</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/" rel="tag">node</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pm2/" rel="tag">pm2</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/" rel="tag">webpack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%85%83%E7%BC%96%E7%A8%8B/" rel="tag">元编程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8E%9F%E5%88%9B/" rel="tag">原创</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%89%92%E8%B0%B1/" rel="tag">扒谱</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%96%87%E4%BB%B6%E5%8A%A0%E8%BD%BD/" rel="tag">文件加载</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%AE%97%E6%B3%95/" rel="tag">算法</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/Node/" style="font-size: 10px;">Node</a> <a href="/tags/Node-js/" style="font-size: 10px;">Node.js</a> <a href="/tags/Ruby/" style="font-size: 20px;">Ruby</a> <a href="/tags/Slain-Memories/" style="font-size: 10px;">Slain Memories</a> <a href="/tags/Wall-slide/" style="font-size: 15px;">Wall slide</a> <a href="/tags/babel/" style="font-size: 10px;">babel</a> <a href="/tags/decorator/" style="font-size: 10px;">decorator</a> <a href="/tags/electron/" style="font-size: 10px;">electron</a> <a href="/tags/es6/" style="font-size: 10px;">es6</a> <a href="/tags/es7/" style="font-size: 15px;">es7</a> <a href="/tags/node/" style="font-size: 10px;">node</a> <a href="/tags/pm2/" style="font-size: 10px;">pm2</a> <a href="/tags/webpack/" style="font-size: 10px;">webpack</a> <a href="/tags/%E5%85%83%E7%BC%96%E7%A8%8B/" style="font-size: 15px;">元编程</a> <a href="/tags/%E5%8E%9F%E5%88%9B/" style="font-size: 20px;">原创</a> <a href="/tags/%E6%89%92%E8%B0%B1/" style="font-size: 20px;">扒谱</a> <a href="/tags/%E6%96%87%E4%BB%B6%E5%8A%A0%E8%BD%BD/" style="font-size: 10px;">文件加载</a> <a href="/tags/%E7%AE%97%E6%B3%95/" style="font-size: 10px;">算法</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">March 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">June 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">August 2016</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2020/03/08/slain-memories/">扒谱第三弹《Slain Memories》</a>
+          </li>
+        
+          <li>
+            <a href="/2019/06/07/third-song/">Em转Bm小调第三进行曲</a>
+          </li>
+        
+          <li>
+            <a href="/2018/03/23/wall-slide-v2/">Wall slide自扒试听</a>
+          </li>
+        
+          <li>
+            <a href="/2017/08/27/second-song/">e小调第二进行曲</a>
+          </li>
+        
+          <li>
+            <a href="/2017/06/07/first-song/">降b小调第一进行曲</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2022 Sven<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+
+  
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+  </div>
+</body>
+</html>

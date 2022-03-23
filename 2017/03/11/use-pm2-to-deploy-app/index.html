@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>使用pm2来启动并监控你的守护进程 | Sven的博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="pm2是基于Node.js开发的集代码发布、部署与监控为一体的工具。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用pm2来启动并监控你的守护进程">
+<meta property="og:url" content="http://yoursite.com/2017/03/11/use-pm2-to-deploy-app/index.html">
+<meta property="og:site_name" content="Sven的博客">
+<meta property="og:description" content="pm2是基于Node.js开发的集代码发布、部署与监控为一体的工具。">
+<meta property="og:locale">
+<meta property="article:published_time" content="2017-03-10T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-03-23T10:00:56.879Z">
+<meta property="article:author" content="Sven">
+<meta property="article:tag" content="Node.js">
+<meta property="article:tag" content="pm2">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="Sven的博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+
+<meta name="generator" content="Hexo 6.1.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Sven的博客</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-use-pm2-to-deploy-app" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/03/11/use-pm2-to-deploy-app/" class="article-date">
+  <time datetime="2017-03-10T16:00:00.000Z" itemprop="datePublished">2017-03-11</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      使用pm2来启动并监控你的守护进程
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>pm2是基于Node.js开发的集代码发布、部署与监控为一体的工具。</p>
+<span id="more"></span>
+<h2 id="安装pm2"><a href="#安装pm2" class="headerlink" title="安装pm2"></a>安装pm2</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm i -g pm2</span><br></pre></td></tr></table></figure>
+<h2 id="支持的发布程序类型-interpreter"><a href="#支持的发布程序类型-interpreter" class="headerlink" title="支持的发布程序类型(interpreter)"></a>支持的发布程序类型(interpreter)</h2><ul>
+<li>.sh (bash)</li>
+<li>.pl (perl)</li>
+<li>.py (python)</li>
+<li>.rb (ruby)</li>
+<li>.coffee (coffeescript)</li>
+<li>.php (php)</li>
+<li>.js (node)</li>
+</ul>
+<p>pm2 支持以上所有类型的代码启动，当运行<code>pm2 start app.js</code>时，由于文件类型为<code>.js</code>，pm2将自动设置<code>interpreter</code>为<code>node</code>，其余同理。若要发布<code>golang</code>程序，则只需要编写一个<code>bash</code>脚本来启动<code>golang</code>二进制程序，然后<code>pm2</code>启动这个<code>bash</code>脚本即可。</p>
+<h2 id="pm2的优点"><a href="#pm2的优点" class="headerlink" title="pm2的优点"></a>pm2的优点</h2><ul>
+<li>无缝重启  当重启失败时，将不会杀死老进程，保证服务继承可用(必须是cluster模式启动，然后以reload命令重启才可以)</li>
+<li>提供多重环境部署  通过<code>ecosystem.config.js</code>可以实现一条命令即可将代码发布到相应的环境中</li>
+<li>提供回滚机制  pm2每发布一个版本都会进行备份，可以通过<code>revert</code>命令回滚到上一个版本</li>
+<li>命令行强大  pm2提供了大量简短的命令可以提升工作效率</li>
+<li>内部负载均衡  pm2以<code>cluster</code>模式启动多进程时，内部提供了负载均衡的机制</li>
+<li>内存溢出时自动重启  通过配置进程占用内存上限，当内存溢出时自动重启</li>
+<li>支持docker部署  提供了pm2-docker命令</li>
+<li>提供apm在线监控  可以在线使用<code>keymetrics</code>服务进行监控</li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/03/11/use-pm2-to-deploy-app/" data-id="cl13gprpl000g2ms67aia27lj" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Node-js/" rel="tag">Node.js</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/pm2/" rel="tag">pm2</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2017/05/25/wall-slide/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          Wall slide自扒试听
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2016/11/21/es7-decorator/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">es7修饰器</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node/" rel="tag">Node</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node-js/" rel="tag">Node.js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Ruby/" rel="tag">Ruby</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Slain-Memories/" rel="tag">Slain Memories</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Wall-slide/" rel="tag">Wall slide</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/babel/" rel="tag">babel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/decorator/" rel="tag">decorator</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/electron/" rel="tag">electron</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/es6/" rel="tag">es6</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/es7/" rel="tag">es7</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/" rel="tag">node</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pm2/" rel="tag">pm2</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/" rel="tag">webpack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%85%83%E7%BC%96%E7%A8%8B/" rel="tag">元编程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8E%9F%E5%88%9B/" rel="tag">原创</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%89%92%E8%B0%B1/" rel="tag">扒谱</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%96%87%E4%BB%B6%E5%8A%A0%E8%BD%BD/" rel="tag">文件加载</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%AE%97%E6%B3%95/" rel="tag">算法</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/Node/" style="font-size: 10px;">Node</a> <a href="/tags/Node-js/" style="font-size: 10px;">Node.js</a> <a href="/tags/Ruby/" style="font-size: 20px;">Ruby</a> <a href="/tags/Slain-Memories/" style="font-size: 10px;">Slain Memories</a> <a href="/tags/Wall-slide/" style="font-size: 15px;">Wall slide</a> <a href="/tags/babel/" style="font-size: 10px;">babel</a> <a href="/tags/decorator/" style="font-size: 10px;">decorator</a> <a href="/tags/electron/" style="font-size: 10px;">electron</a> <a href="/tags/es6/" style="font-size: 10px;">es6</a> <a href="/tags/es7/" style="font-size: 15px;">es7</a> <a href="/tags/node/" style="font-size: 10px;">node</a> <a href="/tags/pm2/" style="font-size: 10px;">pm2</a> <a href="/tags/webpack/" style="font-size: 10px;">webpack</a> <a href="/tags/%E5%85%83%E7%BC%96%E7%A8%8B/" style="font-size: 15px;">元编程</a> <a href="/tags/%E5%8E%9F%E5%88%9B/" style="font-size: 20px;">原创</a> <a href="/tags/%E6%89%92%E8%B0%B1/" style="font-size: 20px;">扒谱</a> <a href="/tags/%E6%96%87%E4%BB%B6%E5%8A%A0%E8%BD%BD/" style="font-size: 10px;">文件加载</a> <a href="/tags/%E7%AE%97%E6%B3%95/" style="font-size: 10px;">算法</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">March 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">June 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">August 2016</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2020/03/08/slain-memories/">扒谱第三弹《Slain Memories》</a>
+          </li>
+        
+          <li>
+            <a href="/2019/06/07/third-song/">Em转Bm小调第三进行曲</a>
+          </li>
+        
+          <li>
+            <a href="/2018/03/23/wall-slide-v2/">Wall slide自扒试听</a>
+          </li>
+        
+          <li>
+            <a href="/2017/08/27/second-song/">e小调第二进行曲</a>
+          </li>
+        
+          <li>
+            <a href="/2017/06/07/first-song/">降b小调第一进行曲</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2022 Sven<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+
+  
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>es7中的async/await | Sven的博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Node.js es7标准中加入了async&#x2F;await用于处理异步函数。 async标记的函数中方能调用await, await用于等待异步函数的返回值, 而await目标必须是一个promise对象, 因此实际上await就是对promise对象取它的resolve值。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="es7中的async&#x2F;await">
+<meta property="og:url" content="http://yoursite.com/2016/10/15/es7-async-and-await/index.html">
+<meta property="og:site_name" content="Sven的博客">
+<meta property="og:description" content="Node.js es7标准中加入了async&#x2F;await用于处理异步函数。 async标记的函数中方能调用await, await用于等待异步函数的返回值, 而await目标必须是一个promise对象, 因此实际上await就是对promise对象取它的resolve值。">
+<meta property="og:locale">
+<meta property="article:published_time" content="2016-10-14T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-03-23T10:00:56.671Z">
+<meta property="article:author" content="Sven">
+<meta property="article:tag" content="node">
+<meta property="article:tag" content="es7">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="Sven的博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+
+<meta name="generator" content="Hexo 6.1.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Sven的博客</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-es7-async-and-await" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2016/10/15/es7-async-and-await/" class="article-date">
+  <time datetime="2016-10-14T16:00:00.000Z" itemprop="datePublished">2016-10-15</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      es7中的async/await
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Node.js es7标准中加入了async/await用于处理异步函数。 <code>async</code>标记的函数中方能调用<code>await</code>, <code>await</code>用于等待异步函数的返回值, 而<code>await</code>目标必须是一个<code>promise</code>对象, 因此实际上<code>await</code>就是对<code>promise</code>对象取它的<code>resolve</code>值。</p>
+<span id="more"></span>
+<h3 id="使用babel-node运行es7代码"><a href="#使用babel-node运行es7代码" class="headerlink" title="使用babel-node运行es7代码"></a>使用babel-node运行es7代码</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">npm install -g babel-cli</span><br><span class="line">npm install babel-preset-es2015 babel-preset-stage-2 --save-dev</span><br></pre></td></tr></table></figure>
+<p>然后添加<code>.babelrc</code>文件，添加以下内容:</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;presets&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">    <span class="string">&quot;es2015&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="string">&quot;stage-2&quot;</span></span><br><span class="line">  <span class="punctuation">]</span><span class="punctuation">,</span>  </span><br><span class="line">  <span class="attr">&quot;plugins&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="punctuation">]</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+<p>此时就可以使用<code>babel-node app.js</code>运行es7代码了。</p>
+<h3 id="另一种方式"><a href="#另一种方式" class="headerlink" title="另一种方式"></a>另一种方式</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install babel-core babel-polyfill --save</span><br></pre></td></tr></table></figure>
+<p>在程序入口文件 <code>index.js</code>中:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">require</span>(<span class="string">&#x27;babel-core/register&#x27;</span>)</span><br><span class="line"><span class="built_in">require</span>(<span class="string">&#x27;babel-polyfill&#x27;</span>)</span><br><span class="line"><span class="built_in">require</span>(<span class="string">&#x27;./app&#x27;</span>)</span><br></pre></td></tr></table></figure>
+<p>这样一来也可以在<code>app.js</code>或其他文件中编写es7代码了。</p>
+<h3 id="传统的Promise生成"><a href="#传统的Promise生成" class="headerlink" title="传统的Promise生成"></a>传统的Promise生成</h3><h4 id="【示例代码1】"><a href="#【示例代码1】" class="headerlink" title="【示例代码1】"></a>【示例代码1】</h4><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">readWithPromise</span>(<span class="params">filePath</span>) &#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Promise</span>(<span class="function">(<span class="params">resolve, reject</span>) =&gt;</span> &#123;</span><br><span class="line">    fs.<span class="title function_">readFile</span>(filePath, <span class="function">(<span class="params">err, data</span>) =&gt;</span> &#123;</span><br><span class="line">      <span class="keyword">if</span> (err) &#123;</span><br><span class="line">        <span class="title function_">reject</span>(err);</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="title function_">resolve</span>(data);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这段代码就是一返回一个promise对象,它的作用是读取一个文件的内容，因此我们要调用时只需要如下操作:</p>
+<h4 id="【示例代码2】"><a href="#【示例代码2】" class="headerlink" title="【示例代码2】"></a>【示例代码2】</h4><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">run</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="keyword">let</span> data;</span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">    data = <span class="keyword">await</span> <span class="title function_">readWithPromise</span>(<span class="string">&quot;./package.json&quot;</span>);</span><br><span class="line">    <span class="comment">//data = await readWithGenerator(&quot;./package.json&quot;);</span></span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(data.<span class="title function_">toString</span>());</span><br><span class="line">  &#125; <span class="keyword">catch</span>(e) &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">error</span>(e);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="title function_">run</span>();</span><br></pre></td></tr></table></figure>
+<h3 id="以Generator方式"><a href="#以Generator方式" class="headerlink" title="以Generator方式"></a>以Generator方式</h3><p>除此之外，还有一种生成<code>promise</code>对象的方法, 那便是<code>generator</code>, 使用这种方法需要引用<code>co</code>这个包, 代码如下:</p>
+<h4 id="【示例代码3】"><a href="#【示例代码3】" class="headerlink" title="【示例代码3】"></a>【示例代码3】</h4><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> co <span class="keyword">from</span> <span class="string">&#x27;co&#x27;</span>;</span><br><span class="line"><span class="keyword">function</span> <span class="title function_">readWithGenerator</span>(<span class="params">filePath</span>) &#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="title function_">co</span>(<span class="keyword">function</span>*()&#123;</span><br><span class="line">    <span class="keyword">let</span> content = <span class="keyword">yield</span> (<span class="function">(<span class="params">fp</span>) =&gt;</span> &#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="function">(<span class="params">callback</span>) =&gt;</span> &#123;</span><br><span class="line">        fs.<span class="title function_">readFile</span>(fp, <span class="string">&quot;utf8&quot;</span>, callback);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;)(filePath);</span><br><span class="line">    <span class="keyword">return</span> content;</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>【示例代码1】</code>与<code>【示例代码3】</code>作用完全一样, 最后它们都返回一个<code>promise</code>对象，因此调用方式也一样(见<code>【示例代码2】</code>).</p>
+<h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p><code>await</code> 仅仅只是<code>es7</code>加入的默认对<code>promise</code>的一种处理机制而已，它的作用其实类似于<code>generator</code>里面的<code>yield</code>。<code>yield</code>后面加的可以是一个<code>generator</code>函数，也可以是<code>promise</code>对象，甚至可以是一个<code>promise</code>数组等;而<code>await</code>后面接的只能是一个<code>promise</code>对象，但它们都会在此等待结果返回后才会执行之后的代码。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2016/10/15/es7-async-and-await/" data-id="cl13gprpf00012ms6ez862ww9" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/es7/" rel="tag">es7</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/node/" rel="tag">node</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2016/10/23/electron-built-with-webpack/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          使用webpack构建electron项目
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2016/08/29/metaprogramming-methods/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Ruby元编程-方法</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node/" rel="tag">Node</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Node-js/" rel="tag">Node.js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Ruby/" rel="tag">Ruby</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Slain-Memories/" rel="tag">Slain Memories</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Wall-slide/" rel="tag">Wall slide</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/babel/" rel="tag">babel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/decorator/" rel="tag">decorator</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/electron/" rel="tag">electron</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/es6/" rel="tag">es6</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/es7/" rel="tag">es7</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/" rel="tag">node</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pm2/" rel="tag">pm2</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/" rel="tag">webpack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%85%83%E7%BC%96%E7%A8%8B/" rel="tag">元编程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8E%9F%E5%88%9B/" rel="tag">原创</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%89%92%E8%B0%B1/" rel="tag">扒谱</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%96%87%E4%BB%B6%E5%8A%A0%E8%BD%BD/" rel="tag">文件加载</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%AE%97%E6%B3%95/" rel="tag">算法</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/Node/" style="font-size: 10px;">Node</a> <a href="/tags/Node-js/" style="font-size: 10px;">Node.js</a> <a href="/tags/Ruby/" style="font-size: 20px;">Ruby</a> <a href="/tags/Slain-Memories/" style="font-size: 10px;">Slain Memories</a> <a href="/tags/Wall-slide/" style="font-size: 15px;">Wall slide</a> <a href="/tags/babel/" style="font-size: 10px;">babel</a> <a href="/tags/decorator/" style="font-size: 10px;">decorator</a> <a href="/tags/electron/" style="font-size: 10px;">electron</a> <a href="/tags/es6/" style="font-size: 10px;">es6</a> <a href="/tags/es7/" style="font-size: 15px;">es7</a> <a href="/tags/node/" style="font-size: 10px;">node</a> <a href="/tags/pm2/" style="font-size: 10px;">pm2</a> <a href="/tags/webpack/" style="font-size: 10px;">webpack</a> <a href="/tags/%E5%85%83%E7%BC%96%E7%A8%8B/" style="font-size: 15px;">元编程</a> <a href="/tags/%E5%8E%9F%E5%88%9B/" style="font-size: 20px;">原创</a> <a href="/tags/%E6%89%92%E8%B0%B1/" style="font-size: 20px;">扒谱</a> <a href="/tags/%E6%96%87%E4%BB%B6%E5%8A%A0%E8%BD%BD/" style="font-size: 10px;">文件加载</a> <a href="/tags/%E7%AE%97%E6%B3%95/" style="font-size: 10px;">算法</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">March 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">June 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/08/">August 2016</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2020/03/08/slain-memories/">扒谱第三弹《Slain Memories》</a>
+          </li>
+        
+          <li>
+            <a href="/2019/06/07/third-song/">Em转Bm小调第三进行曲</a>
+          </li>
+        
+          <li>
+            <a href="/2018/03/23/wall-slide-v2/">Wall slide自扒试听</a>
+          </li>
+        
+          <li>
+            <a href="/2017/08/27/second-song/">e小调第二进行曲</a>
+          </li>
+        
+          <li>
+            <a href="/2017/06/07/first-song/">降b小调第一进行曲</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2022 Sven<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+
+  
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+  </div>
+</body>
+</html>
